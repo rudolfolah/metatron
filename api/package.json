@@ -1,0 +1,16 @@
+{
+  "name": "metatron_api",
+  "version": "1.0.0",
+  "description": "Containerized versions of `whisper.cpp`, `llmama.cpp`, and `piper` with Node.js API wrapper.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Rudolf Olah <rudolf.olah.to@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^16.3.1",
+    "expressjs": "^1.0.1",
+    "ws": "^8.13.0"
+  }
+}
