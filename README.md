@@ -31,3 +31,42 @@ Debugging:
 ```
 docker build -t metatron --no-cache .
 ```
+
+## Architecture
+
+```mermaid
+sequenceDiagram
+    participant Web as web app
+    participant A as API
+    participant K as Kafka
+    participant W_whisper as whisper.cpp worker
+    participant W_llama as llama.cpp worker
+    participant W_piper as piper worker
+    Web ->> A: request (http)
+    A ->> K: queue transcribe
+    K ->> W_whisper: process
+    W_whisper ->> K: queue prompt
+    K ->> W_llama: process
+    W_llama ->> K: queue llama
+    K ->> W_piper: process
+    W_piper ->> K: queue completed
+    loop
+        K ->> A: completed
+        A -->> Web: response (websocket)
+    end
+```
+
+```mermaid
+graph TD
+    A[API] <--> K[Kafka]
+    S[Storage] --> A
+    K <--> W_piper[piper\nworker]
+    K <--> W_whisper[whisper.cpp\nworker]
+    K <--> W_llama[llama.cpp\nworker]
+    Web[web app] --request--> A
+    Web <--web socket--> A
+    K --> Z[Zookeeper]
+    W_piper --> S
+    W_whisper --> S
+    W_llama --> S
+```
