@@ -35,38 +35,51 @@ docker build -t metatron --no-cache .
 ## Architecture
 
 ```mermaid
-sequenceDiagram
-    participant Web as web app
-    participant A as API
-    participant K as Kafka
-    participant W_whisper as whisper.cpp worker
-    participant W_llama as llama.cpp worker
-    participant W_piper as piper worker
-    Web ->> A: request (http)
-    A ->> K: queue transcribe
-    K ->> W_whisper: process
-    W_whisper ->> K: queue prompt
-    K ->> W_llama: process
-    W_llama ->> K: queue llama
-    K ->> W_piper: process
-    W_piper ->> K: queue completed
-    loop
-        K ->> A: completed
-        A -->> Web: response (websocket)
-    end
-```
-
-```mermaid
 graph TD
     A[API] <--> K[Kafka]
     S[Storage] --> A
     K <--> W_piper[piper\nworker]
     K <--> W_whisper[whisper.cpp\nworker]
     K <--> W_llama[llama.cpp\nworker]
-    Web[web app] --request--> A
+    Web[web app] --http--> A
     Web <--web socket--> A
     K --> Z[Zookeeper]
     W_piper --> S
     W_whisper --> S
-    W_llama --> S
 ```
+
+### Data Flow
+
+1. API generates a UUID for the request:
+   * callback topic is `metatron-response-${UUID}`
+   * API subscribes to the callback topic:
+     * when a message is received, it is sent to the client via web socket
+     * when a message is received, it is deleted from the topic
+       * the transcription will be displayed in the web app
+       * the prompt and response will be displayed in the web app
+       * the synthesized audio will be played in the web app
+2. API sends message to `transcribe` topic with:
+   * UUID
+   * audio file id
+   * callback topic
+3. Whisper worker consumes message from `transcribe` topic
+4. Whisper worker sends message to callback topic with:
+   * UUID
+   * transcription data
+5. API sends message to `prompt` topic with:
+   * UUID
+   * prompt data
+   * callback topic
+6. Llama worker consumes message from `prompt` topic
+7. Llama worker sends message to callback topic with:
+   * UUID
+   * response data
+8. API sends message to `synthesize` topic with:
+   * UUID
+   * response data
+   * callback topic
+9. Piper worker consumes message from `synthesize` topic
+10. Piper worker uploads audio to storage
+11. Piper worker sends message to callback topic with:
+    * UUID
+    * audio file id
