@@ -1,3 +1,6 @@
+const http = require("node:http");
+const fs = require("node:fs");
+const FormData = require("form-data");
 const { Kafka } = require('kafkajs');
 
 const kafka = new Kafka({
@@ -14,15 +17,27 @@ async function main() {
   await consumer.run({
     eachMessage: async ({ topic, partition, message }) => {
       if (topic === 'tts-queue') {
-        // TODO: send the message to piper and then save the resulting audio file
         console.log('Message received from Kafka:', message.value.toString());
+        // TODO: send the message to piper and then save the resulting audio file
+        // send file to api http://localhost:3000/upload_response
+        const form = new FormData();
+        form.append('response', fs.createReadStream('package.json'));
+        const req = http.request({
+          host: 'api',
+          port: 3000,
+          path: '/upload_response',
+          method: 'POST',
+          headers: form.getHeaders(),
+        });
+        form.pipe(req);
+        req.on('response', function(res) {
+          console.log(res.statusCode);
+        });
       }
     }
   })
 }
 
-main().then(() => {
-  console.log('Done');
-}).catch((err) => {
+main().catch((err) => {
   console.error(err);
 });
