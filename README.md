@@ -1,18 +1,30 @@
 # metatron
 
-Metatron is a project that brings together `whisper.cpp`, `llmama.cpp`, and `piper` into one Docker container with an awesome Node.js API wrapper.
+Metatron is a project that brings together `whisper.cpp`, `llama.cpp`, and `piper` into a deployable stack with an awesome Node.js API wrapper for each of them.
 
-Dockerfile is based on:
-* [llmama Dockerfile](https://github.com/ggerganov/llama.cpp/blob/master/.devops/main.Dockerfile)
-* [piper Dockerfile](https://github.com/rhasspy/piper/blob/master/Dockerfile)
+Why? So you can deploy and scale out each part in your own network, and use the API to interact with them:
+* Send audio through the whisper API for a transcription
+* Send a prompt through llama API for a response
+* Send a response through piper API for text-to-speech audio
 
 ## Usage
 
 ```
-docker build -t metatron .
-docker run -it metatron
+git submodule update --init --recursive
+cd piper && docker buildx build --target build -t piper:latest .
 
-docker run -it --rm -p 8080:8080 metatron
+# for local development
+docker build --target localdev -t metatron-api:localdev -f ./Dockerfile-api .
+docker build --target localdev -t metatron-piper:localdev -f ./Dockerfile-piper .
+docker build --target localdev -t metatron-llama:localdev -f ./Dockerfile-llama .
+docker build --target localdev -t metatron-whisper:localdev -f ./Dockerfile-whisper .
+docker compose up
+
+# for production
+docker build -t metatron-api:latest -f ./Dockerfile-api .
+docker build -t metatron-piper:latest -f ./Dockerfile-piper .
+docker build -t metatron-llama:latest -f ./Dockerfile-llama .
+docker build -t metatron-whisper:latest -f ./Dockerfile-whisper .
 ```
 
 Debugging:
