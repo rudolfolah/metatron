@@ -40,7 +40,7 @@ async function main() {
   app.get('/test', async (req, res) => {
     const timestamp = Date.now();
     await producer.send({
-      topic: 'tts-queue',
+      topic: 'text_to_speech',
       messages: [
         { value: 'Hello, world this a test using Kafka to produce a message that is consumed by a worker process.' },
       ],

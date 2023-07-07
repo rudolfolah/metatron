@@ -13,10 +13,10 @@ async function main() {
   const consumer = kafka.consumer({ groupId: 'metatron' });
   await producer.connect();
   await consumer.connect();
-  await consumer.subscribe({ topic: 'tts-queue' });
+  await consumer.subscribe({ topic: 'text_to_speech' });
   await consumer.run({
     eachMessage: async ({ topic, partition, message }) => {
-      if (topic === 'tts-queue') {
+      if (topic === 'text_to_speech') {
         console.log('Message received from Kafka:', message.value.toString());
         // TODO: send the message to piper and then save the resulting audio file
         // send file to api http://localhost:3000/upload_response
