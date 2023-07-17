@@ -37,6 +37,12 @@ async function main() {
     console.log(`Server listening on port ${process.env.API_SERVER_PORT}`);
   });
 
+  await consumer.subscribe({ topic: 'completed' });
+  await consumer.run({
+    eachMessage: async ({ topic, partition, message}) => {
+    }
+  });
+
   app.get('/test', async (req, res) => {
     const timestamp = Date.now();
     await producer.send({
