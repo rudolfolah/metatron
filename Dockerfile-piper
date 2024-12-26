@@ -1,8 +1,9 @@
 FROM piper:latest AS base
 RUN rm -rf /build
 WORKDIR /dist
-RUN curl -L --output voice-en-us-lessac-medium.tar.gz https://github.com/rhasspy/piper/releases/download/v0.0.2/voice-en-us-lessac-medium.tar.gz && tar -xvf voice-en-us-lessac-medium.tar.gz
-RUN rm piper_*.tar.gz voice-en-us-lessac-medium.tar.gz
+RUN curl -L --output voice-en-us-lessac-medium.tar.gz https://github.com/rhasspy/piper/releases/download/v0.0.2/voice-en-us-lessac-medium.tar.gz \
+    && tar -xvf voice-en-us-lessac-medium.tar.gz \
+    && rm piper_*.tar.gz voice-en-us-lessac-medium.tar.gz
 
 FROM node:lts-slim AS localdev
 ENV API_SERVER_PORT=3000
