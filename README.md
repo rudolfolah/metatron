@@ -9,7 +9,14 @@ Why? So you can deploy and scale out each part in your own network, and use the 
 
 ## Usage
 
+```shell
+# Builds the images from local Dockerfiles
+./localdev_build.sh
+# Starts the Docker Compose project with a screen session to the web server and background workers
+./localdev_start.sh
 ```
+
+```shell
 git submodule update --init --recursive
 cd piper && docker buildx build --target build -t piper:latest .
 
@@ -28,7 +35,8 @@ docker build -t metatron-whisper:latest -f ./Dockerfile-whisper .
 ```
 
 Debugging:
-```
+
+```shell
 docker build -t metatron --no-cache .
 ```
 
