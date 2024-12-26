@@ -1,14 +1,14 @@
-FROM piper:latest as base
+FROM piper:latest AS base
 RUN rm -rf /build
 WORKDIR /dist
 RUN rm piper_*.tar.gz
 
-FROM node:lts-slim as localdev
+FROM node:lts-slim AS localdev
 ENV API_SERVER_PORT=3000
 WORKDIR /dist
 COPY --from=base /dist .
 
-FROM localdev as build
+FROM localdev AS build
 COPY api /dist/api
 WORKDIR /dist/api
 RUN cd /dist/api && npm install --omit=dev
