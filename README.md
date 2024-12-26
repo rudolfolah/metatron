@@ -38,9 +38,9 @@ docker build -t metatron --no-cache .
 graph TD
     A[API] <--> K[Kafka]
     S[Storage] --> A
-    K <--> W_piper[piper\nworker]
-    K <--> W_whisper[whisper.cpp\nworker]
-    K <--> W_llama[llama.cpp\nworker]
+    K <--> W_piper[piper<br>worker]
+    K <--> W_whisper[whisper.cpp<br>worker]
+    K <--> W_llama[llama.cpp<br>worker]
     Web[web app] --http--> A
     Web <--web socket--> A
     K --> Z[Zookeeper]
